@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.lang.String;
+
 
 
 public class PrecinctContiguity { 
@@ -75,8 +75,15 @@ public class PrecinctContiguity {
 		public void reduce( Text key, Iterable<Text> values, Context context)
      			throws IOException, InterruptedException {
 			// Find distance of segments
+			double x1, y1, x2, y2;
 			String[] points = key.split(" ");
-
+			String[] point = points[0].split(",");
+			x1 = Double.parseDouble(point[0].replace("(", ""));
+			y1 = Double.parseDouble(point[1].replace(")", ""));
+			point = points[1].split(",");
+			x2 = Double.parseDouble(point[0].replace("(", ""));
+			y2 = Double.parseDouble(point[1].replace(")", ""));
+			double distance = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
 
 			String[] precIDs = new String[2];
     		idx = 0;
@@ -85,14 +92,14 @@ public class PrecinctContiguity {
     		}
 
 			if (idx == 2) {
-				context.write(new Text(precIDs[0]), new Text(precIDs[1]));
-				context.write(new Text(precIDs[1]), new Text(precIDs[0]));
+				context.write(new Text(precIDs[0]), new Text(precIDs[1] + " " + distance.toString()));
+				context.write(new Text(precIDs[1]), new Text(precIDs[0] + " " + distance.toString()));
 			}
 		} // reduce
 	} // reducer
 
 	public static class contiguityMapper     // Need to replace the four type labels there with actual Java class names
-     		extends Mapper< LongWritable, Text, IntWritable, Text > {
+     		extends Mapper< LongWritable, Text, Text, Text > {
 
 		@Override
 		public void map(Text key, Text value, Context context)
@@ -102,10 +109,10 @@ public class PrecinctContiguity {
 	} // totalCountMapper
 
 	public static class contiguityReducer   // needs to replace the four type labels with actual Java class names
-      	extends  Reducer< IntWritable, Text, IntWritable, Text> {
+      	extends  Reducer<Text, Text, Text, Text> {
 
 		@Override  // we are overriding the Reducer's reduce() method
-		public void reduce( IntWritable key, Iterable<Text> values, Context context)
+		public void reduce( Text key, Iterable<Text> values, Context context)
      			throws IOException, InterruptedException {
 
        	context.write(new IntWritable(index), new Text(outputString));
