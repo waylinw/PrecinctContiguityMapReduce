@@ -17,4 +17,4 @@ all :
 clean : rm -f *.class *.jar
 
 upload :
-  scp $(JAR) wwang16@unix13.csc.calpoly.edu:$(OS)
+	scp $(JAR) wwang16@unix13.csc.calpoly.edu:$(OS)
