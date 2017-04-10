@@ -14,7 +14,8 @@ all :
 	javac -cp hadoop-core-1.2.1.jar $(FILES).java
 	jar -cvf $(JAR) $(FILES)*.class
 
-clean : rm -f *.class *.jar
+clean :
+	rm -f *.class *.jar
 
 upload :
 	scp $(JAR) wwang16@unix13.csc.calpoly.edu:$(OS)
